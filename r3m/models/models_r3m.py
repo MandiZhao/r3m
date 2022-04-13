@@ -74,6 +74,7 @@ class R3M(nn.Module):
 
         ## Optimizer
         self.encoder_opt = torch.optim.Adam(params, lr = lr)
+        self.norm = None 
 
     def get_reward(self, e0, es, sentences):
         ## Only callable is langweight was set to be 1
@@ -98,6 +99,13 @@ class R3M(nn.Module):
         obs_p = preprocess(obs)
         h = self.convnet(obs_p)
         return h
+    
+    def extract_feat(self, obs):
+        return self.forward(obs)
+
+    def forward_norm(self, x):
+        assert self.norm is not None, 'neet to initialize layrnorm!'
+        return self.norm(x)
 
     def sim(self, tensor1, tensor2):
         if self.l2dist:
