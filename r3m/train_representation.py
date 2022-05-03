@@ -12,6 +12,7 @@ os.environ['MKL_SERVICE_FORCE_INTEL'] = '1'
 os.environ['MUJOCO_GL'] = 'egl'
 
 from pathlib import Path
+from __init__ import load_r3m
 import hydra
 import numpy as np
 import torch
@@ -43,6 +44,8 @@ class Workspace:
         print("Creating Dataloader")
         if self.cfg.dataset == "ego4d":
             sources = ["ego4d"]
+        elif self.cfg.dataset == "rlbench":
+            sources = ["rlbench"]
         else:
             raise NameError('Invalid Dataset')
 
@@ -123,11 +126,13 @@ class Workspace:
     def save_snapshot(self):
         snapshot = self.work_dir / f'snapshot_{self.global_step}.pt'
         global_snapshot =  self.work_dir / f'snapshot.pt'
+        # local_snapshot = '/shared/ademi_adeniji/r3m/snapshot_resnet50.pt'
         sdict = {}
         sdict["r3m"] = self.model.state_dict()
         torch.save(sdict, snapshot)
         sdict["global_step"] = self._global_step
         torch.save(sdict, global_snapshot)
+        # torch.save(sdict, local_snapshot)
 
     def load_snapshot(self, snapshot_path):
         payload = torch.load(snapshot_path)
